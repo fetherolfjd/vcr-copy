@@ -3,6 +3,17 @@
 A script intended to make it a little easier to capture a video and audio stream from
 a USB capture device.
 
+## Capture Device Options
+
+The video capture card I'm using a Roxio Video Capture USB, UB315-E ver3. It has the RCA
+connections as well as an S-Video connection. I needed to use `v4l2-ctl` to choose the input
+device that the capture card could use; in my case 0 was the composite video, and 1 was the
+S-Video. So, capturing from a camcorder that connected via S-Video would require:
+
+```bash
+v4l2-ctl --set-input 1
+```
+
 ## Resources
 
  - https://www.linux-magazine.com/Issues/2019/219/File-Conversion

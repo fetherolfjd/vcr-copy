@@ -11,6 +11,7 @@ print_help () {
   echo " -p | --outpath: The folder to place the output file; default is script directory"
   echo " -o | --outfile: The name of the output file; default is 'vhs_copy'"
   echo " -v | --videodevice: The video device to stream from; default is '/dev/video0'"
+  echo " -i | --inputdevice: The input of the video to read; deafult is 'composite' other option is 'svideo'"
   echo " -a | --audiodevice: The audio device to stream from; default is 'hw:2,0'"
   echo " -h | --help: Print this message and exit"
   exit 1
@@ -28,6 +29,7 @@ file_ext=".mkv"
 file_name="vhs_copy"
 vid_device="/dev/video0"
 aud_device="hw:2,0"
+inp_device="composite"
 
 for arg in "$@"; do
   case $arg in
@@ -51,6 +53,10 @@ for arg in "$@"; do
     aud_device="${arg#*=}"
     shift
     ;;
+    -i=*|--inputdevice=*)
+    inp_device="${arg#*=}"
+    shift
+    ;;
     -h|--help)
     print_help
     ;;
@@ -62,6 +68,15 @@ for arg in "$@"; do
 done
 
 output_file="${outpath}/${file_name}${file_ext}"
+
+if [ "$inp_device" = "composite" ]; then
+  v4l2-ctl --set-input 0
+elif [ "$inp_device" = "svideo" ]; then
+  v4l2-ctl --set-input 1
+else
+  echo "Unrecognized input device: ${inp_device}"
+  print_help
+fi
 
 # Unmute the device; may not always be necessary, but this seems to work...
 v4l2-ctl -d /dev/video0 --set-ctrl mute=0
